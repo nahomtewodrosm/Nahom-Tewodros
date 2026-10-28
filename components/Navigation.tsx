@@ -7,6 +7,7 @@ import { logout } from "../app/actions";
 const mainLinks = [
   ["Work", "#work"],
   ["About", "#about"],
+  ["Experience", "#experience"],
   ["Notes", "#notes"],
   ["Certifications", "#certifications"],
   ["Contact", "#contact"],
@@ -70,7 +71,7 @@ export function AdminNavigation({
     <>
       <nav className="site-nav admin-nav">
         <Link href="/" className="logo">
-          dashboard<b>✳</b>
+          Nahom's dashboard
         </Link>
         <form action={logout} className="desktop-logout">
           <button className="ghost">Log out</button>

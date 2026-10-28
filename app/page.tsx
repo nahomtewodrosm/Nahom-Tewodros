@@ -1,9 +1,44 @@
 import Link from "next/link";
 import { prisma } from "../lib/prisma";
 import ContactForm from "../components/ContactForm";
+import CertificationCard from "../components/CertificationCard";
+import ExperienceTimeline from "../components/ExperienceTimeline";
 import HeroShowcase from "../components/HeroShowcase";
+import NotesList from "../components/NotesList";
+import ProjectCard from "../components/ProjectCard";
 import { MainNavigation } from "../components/Navigation";
 export const dynamic = "force-dynamic";
+
+const experience = [
+  {
+    title: "Junior Full Stack Developer",
+    company: "QmemDevs Tech Inc.",
+    dates: "2022 – Present",
+    description:
+      "Led development of multiple web applications using React, Node.js, and AWS. Implemented CI/CD pipelines and mentored junior developers.",
+  },
+  {
+    title: "Web Developer Intern",
+    company: "Truest Tech Agency",
+    dates: "2020",
+    description:
+      "Built and maintained websites for clients using JavaScript, HTML, and CSS, with a focus on SEO best practices.",
+  },
+  {
+    title: "Part-time English Teacher",
+    company: "MH Language University",
+    dates: "2019 – 2023",
+    description:
+      "Taught English language skills, focusing on communication, writing, and comprehension. Developed engaging lesson plans and assessments.",
+  },
+  {
+    title: "Junior Programming Language Trainer",
+    company: "Qmem Cloud Solutions",
+    dates: "2020 – 2022",
+    description:
+      "Worked remotely during the COVID-19 pandemic, teaching programming to internship applicants and clients.",
+  },
+];
 
 export default async function Home() {
   const [projects, posts, certifications, siteSetting] = await Promise.all([
@@ -47,121 +82,95 @@ export default async function Home() {
 
       <section id="about">
         <p className="label">01 / About</p>
-        <h2>One person. Many ways to make something good.</h2>
+        <h2>A liitle about me</h2>
         <p className="muted" style={{ maxWidth: 640 }}>
-          Replace this with your story: where you are, what you care about, and
-          your experience.
+          I'm Nahom Tewodros, a Full-Stack developer and UI designer. I care
+          about how things look, how they work, and the small details that make
+          them feel right. Over four years of working with corporate teams,
+          startups, and my own ideas, I've turned designs into responsive
+          websites and useful products. From Figma to Next & React, I stay close
+          to the whole process.
         </p>
+        <div className="about-links" aria-label="Social profiles">
+          <a
+            className="btn ghost"
+            href="https://github.com/Nahomtewodros101"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+          <a
+            className="btn ghost"
+            href="https://www.linkedin.com/in/nahom-tewodros"
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn
+          </a>
+          <a className="btn ghost" href="mailto:nahomtewodrosm@gmail.com">
+            Gmail
+          </a>
+        </div>
+      </section>
+
+      <section id="experience">
+        <div className="experience-layout">
+          <div className="experience-intro">
+            <p className="label">02 / Experience</p>
+            <h2>Where I’ve put ideas to work.</h2>
+          </div>
+          <ExperienceTimeline items={experience} />
+        </div>
       </section>
 
       <section id="work">
-        <p className="label">02 / Selected work</p>
-        <h2>A few things out in the world.</h2>
-        {projects.length === 0 && (
-          <p className="muted">No projects yet. Add some from /admin.</p>
-        )}
-        <div className="grid">
-          {projects.map((p) => (
-            <article className="proj" key={p.id}>
-              {(p.imageType || p.image) && (
-                <img
-                  src={p.imageType ? `/api/media/project/${p.id}` : p.image}
-                  alt={p.title}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-              )}
-              <div className="pb">
-                {p.tag && <small className="muted">[ {p.tag} ]</small>}
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
-                {p.technologies && (
-                  <div className="tech-stack-chips" aria-label="Technologies used">
-                    {String(p.technologies).split(",").filter(Boolean).map((technology, index) => (
-                      <span
-                        className="tech-stack-chip"
-                        key={technology}
-                        style={{ "--chip-index": index } as React.CSSProperties}
-                      >
-                        {technology.trim()}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {p.url && (
-                  <a
-                    className="btn ghost"
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Visit
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
+        <div className="projects-layout">
+          <div className="projects-intro">
+            <p className="label">03 / Selected work</p>
+            <h2>
+              A few things i have built before.{" "}
+              <span className="muted">More on my GitHub.</span>
+            </h2>
+            {projects.length === 0 && (
+              <p className="muted">No projects yet. Add some from /admin.</p>
+            )}
+          </div>
+          <div className="project-list">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
         </div>
       </section>
 
       <section id="notes">
-        <p className="label">03 / Notes</p>
+        <p className="label">04 / Notes</p>
         <h2>Thinking out loud.</h2>
         {posts.length === 0 && <p className="muted">No posts yet.</p>}
-        {posts.map((p) => (
-          <Link href={`/blog/${p.id}`} className="row" key={p.id}>
-            <small>
-              {p.createdAt.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            </small>
-            <div className="post-row-content">
-              {p.imageType && (
-                <img
-                  className="post-thumbnail"
-                  src={`/api/media/post/${p.id}`}
-                  alt=""
-                  loading="lazy"
-                />
-              )}
-              <div>
-                <h3>{p.title}</h3>
-                <p>{p.excerpt}</p>
-              </div>
-            </div>
-            <span></span>
-          </Link>
-        ))}
+        <NotesList posts={posts} />
       </section>
 
       <section id="certifications">
-        <p className="label">04 / Certifications</p>
+        <p className="label">05 / Certifications</p>
         <h2>Learning, put into practice.</h2>
         {certifications.length === 0 ? (
           <p className="muted">New certifications will appear here.</p>
         ) : (
           <div className="certification-grid">
             {certifications.map((certification) => (
-              <a
-                className="certification-card"
-                href={certification.url}
+              <CertificationCard
                 key={certification.id}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="certification-mark" aria-hidden="true">✳</span>
-                <span className="certification-name">{certification.name}</span>
-                <span className="certification-arrow" aria-hidden="true">↗</span>
-              </a>
+                name={certification.name}
+                url={certification.url}
+              />
             ))}
           </div>
         )}
       </section>
 
       <section id="contact">
-        <p className="label">05 / Contact</p>
+        <p className="label">06 / Contact</p>
         <h2>Make something good together.</h2>
         <ContactForm />
       </section>
