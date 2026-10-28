@@ -1,0 +1,58 @@
+"use client";
+import { useState } from "react";
+import { sendMessage } from "../app/actions";
+
+export default function ContactForm() {
+  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
+    "idle",
+  );
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setStatus("sending");
+    try {
+      const res = await sendMessage(new FormData(form));
+      if (res.ok) {
+        form.reset();
+        setStatus("ok");
+      } else setStatus("err");
+    } catch {
+      setStatus("err");
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="stack">
+      {status === "ok" && (
+        <p className="alert ok" role="status">
+          ✓ Thank you! Your message was sent successfully. I’ll get back to you
+          soon.
+        </p>
+      )}
+      {status === "err" && (
+        <p className="alert err" role="alert">
+          ✕ Sorry, your message failed to send. Please try again later.
+        </p>
+      )}
+      <input
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        style={{ position: "absolute", left: "-9999px" }}
+      />
+      <input name="name" placeholder="Your name" required />
+      <input name="email" type="email" placeholder="Your email" required />
+      <textarea
+        name="body"
+        rows={5}
+        placeholder="What's on your mind?"
+        required
+      />
+      <button disabled={status === "sending"}>
+        {status === "sending" ? "Sending…" : "Send message ↗"}
+      </button>
+    </form>
+  );
+}
