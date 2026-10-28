@@ -1,5 +1,7 @@
 {
+  "/api/media/[kind]/[id]/route": "app/api/media/[kind]/[id]/route.js",
   "/page": "app/page.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/blog/[id]/page": "app/blog/[id]/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/login/page": "app/admin/login/page.js"
 }

@@ -1,45 +1,102 @@
 import Link from "next/link";
 import { prisma } from "../lib/prisma";
-import { sendMessage } from "./actions";
+import ContactForm from "../components/ContactForm";
+import { MainNavigation } from "../components/Navigation";
 export const dynamic = "force-dynamic";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string }> }) {
-  const { sent } = await searchParams;
+export default async function Home() {
   const [projects, posts] = await Promise.all([
-    prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: "desc" } }),
+    prisma.project.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        tag: true,
+        url: true,
+        image: true,
+        imageType: true,
+      },
+    }),
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        createdAt: true,
+        imageType: true,
+      },
+    }),
   ]);
   return (
     <div className="wrap">
-      <nav>
-        <Link href="/" className="logo">yourname<b>✳</b></Link>
-        <div><a href="#work">Work</a><a href="#about">About</a><a href="#notes">Notes</a><a href="#contact">Contact</a></div>
-      </nav>
+      <MainNavigation />
       <header className="hero">
-        <p className="label">Independent developer &amp; designer</p>
-        <h1>Good design.<br /><em>Thoughtful</em> code.</h1>
-        <p className="lede">Write one or two lines about what you build and who you build it for.</p>
-        <a className="btn" href="#work">Explore my work ↗</a>{" "}
-        <a className="btn ghost" href="#about">A little about me ↘</a>
+        <p className="label">Independent developer</p>
+        <h1>
+          Good design.
+          <br />
+          <em>Thoughtful</em> code.
+        </h1>
+        <p className="lede">
+          I create Stunning digital experiences with modern tech. Specializing
+          in building exceptional websites, applications, and everything in
+          between{" "}
+        </p>
+        <a className="btn" href="#work">
+          Explore my work
+        </a>{" "}
+        <a className="btn ghost" href="#about">
+          A little about me
+        </a>
       </header>
 
       <section id="about">
         <p className="label">01 / About</p>
         <h2>One person. Many ways to make something good.</h2>
-        <p className="muted" style={{ maxWidth: 640 }}>Replace this with your story: where you are, what you care about, and your experience.</p>
+        <p className="muted" style={{ maxWidth: 640 }}>
+          Replace this with your story: where you are, what you care about, and
+          your experience.
+        </p>
       </section>
 
       <section id="work">
         <p className="label">02 / Selected work</p>
         <h2>A few things out in the world.</h2>
-        {projects.length === 0 && <p className="muted">No projects yet. Add some from /admin.</p>}
-        {projects.map((p, i) => (
-          <div className="row" key={p.id}>
-            <small>{String(i + 1).padStart(2, "0")}</small>
-            <div><h3>{p.title}</h3><p>{p.summary}</p>{p.tag && <small>[ {p.tag} ]</small>}</div>
-            {p.url && <a className="btn ghost" href={p.url} target="_blank" rel="noreferrer">Visit ↗</a>}
-          </div>
-        ))}
+        {projects.length === 0 && (
+          <p className="muted">No projects yet. Add some from /admin.</p>
+        )}
+        <div className="grid">
+          {projects.map((p) => (
+            <article className="proj" key={p.id}>
+              {(p.imageType || p.image) && (
+                <img
+                  src={p.imageType ? `/api/media/project/${p.id}` : p.image}
+                  alt={p.title}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              )}
+              <div className="pb">
+                {p.tag && <small className="muted">[ {p.tag} ]</small>}
+                <h3>{p.title}</h3>
+                <p>{p.summary}</p>
+                {p.url && (
+                  <a
+                    className="btn ghost"
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Visit ↗
+                  </a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section id="notes">
@@ -48,8 +105,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         {posts.length === 0 && <p className="muted">No posts yet.</p>}
         {posts.map((p) => (
           <Link href={`/blog/${p.id}`} className="row" key={p.id}>
-            <small>{p.createdAt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</small>
-            <div><h3>{p.title}</h3><p>{p.excerpt}</p></div><span>↗</span>
+            <small>
+              {p.createdAt.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </small>
+            <div className="post-row-content">
+              {p.imageType && (
+                <img
+                  className="post-thumbnail"
+                  src={`/api/media/post/${p.id}`}
+                  alt=""
+                  loading="lazy"
+                />
+              )}
+              <div>
+              <h3>{p.title}</h3>
+              <p>{p.excerpt}</p>
+              </div>
+            </div>
+            <span>↗</span>
           </Link>
         ))}
       </section>
@@ -57,16 +134,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
       <section id="contact">
         <p className="label">04 / Contact</p>
         <h2>Make something good together.</h2>
-        {sent ? <p>Thanks! Your message was sent.</p> : (
-          <form action={sendMessage} className="stack">
-            <input name="name" placeholder="Your name" required />
-            <input name="email" type="email" placeholder="Your email" required />
-            <textarea name="body" rows={5} placeholder="What's on your mind?" required />
-            <button>Send message ↗</button>
-          </form>
-        )}
+        <ContactForm />
       </section>
-      <footer>© {new Date().getFullYear()} Your Name · <Link href="/admin">Admin</Link></footer>
+      <footer>
+        © {new Date().getFullYear()} Your Name ·{" "}
+        <Link href="/admin">Admin</Link>
+      </footer>
     </div>
   );
 }
