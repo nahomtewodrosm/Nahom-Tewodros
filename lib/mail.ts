@@ -13,12 +13,12 @@ export async function sendContactEmails(m: {
   name: string;
   email: string;
   body: string;
-}) {
+}): Promise<{ notificationSent: boolean }> {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, ADMIN_EMAIL, SITE_NAME } =
     process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
     console.warn("SMTP not configured; skipping emails");
-    return;
+    return { notificationSent: false };
   }
   const port = Number(SMTP_PORT || 465);
   const t = nodemailer.createTransport({
@@ -26,6 +26,9 @@ export async function sendContactEmails(m: {
     port,
     secure: port === 465,
     auth: { user: SMTP_USER, pass: SMTP_PASS },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
   });
   const site = SITE_NAME || "Portfolio";
   const from = { name: site, address: SMTP_USER };
@@ -76,7 +79,14 @@ export async function sendContactEmails(m: {
   </div>`,
     }),
   ]);
-  results.forEach(
-    (r) => r.status === "rejected" && console.error("Email failed:", r.reason),
-  );
+  results.forEach((result, index) => {
+    if (result.status === "rejected") {
+      const error = result.reason as { code?: string; responseCode?: number };
+      console.error(index === 0 ? "Admin notification email failed" : "Contact auto-reply failed", {
+        code: error.code,
+        responseCode: error.responseCode,
+      });
+    }
+  });
+  return { notificationSent: results[0].status === "fulfilled" };
 }

@@ -1,4 +1,4 @@
-// @ts-expect-error CSS is handled by the framework bundler.
+// @ts-ignore -- Next.js loads global CSS at runtime; TypeScript may lack CSS declarations.
 import "./globals.css";
 export const metadata = {
   title: "NAHOM TEWODROS",

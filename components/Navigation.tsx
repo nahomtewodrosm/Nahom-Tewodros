@@ -8,10 +8,11 @@ const mainLinks = [
   ["Work", "#work"],
   ["About", "#about"],
   ["Notes", "#notes"],
+  ["Certifications", "#certifications"],
   ["Contact", "#contact"],
 ] as const;
 
-const adminTabs = ["messages", "projects", "posts"] as const;
+const adminTabs = ["messages", "projects", "posts", "certifications"] as const;
 
 export function MainNavigation() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,7 +20,7 @@ export function MainNavigation() {
   return (
     <nav className="site-nav">
       <Link href="/" className="logo">
-        Nahom Tewodros
+        <img src="/logo.gif" alt="Nahom Tewodros" />
       </Link>
       <div className="desktop-nav">
         {mainLinks.map(([label, href]) => (

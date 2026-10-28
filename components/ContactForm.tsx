@@ -3,9 +3,9 @@ import { useState } from "react";
 import { sendMessage } from "../app/actions";
 
 export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
-    "idle",
-  );
+  const [status, setStatus] = useState<
+    "idle" | "sending" | "ok" | "saved" | "err"
+  >("idle");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,9 +15,10 @@ export default function ContactForm() {
       const res = await sendMessage(new FormData(form));
       if (res.ok) {
         form.reset();
-        setStatus("ok");
+        setStatus(res.notificationSent ? "ok" : "saved");
       } else setStatus("err");
-    } catch {
+    } catch (error) {
+      console.error("Contact form submission failed:", error);
       setStatus("err");
     }
   }
@@ -33,6 +34,12 @@ export default function ContactForm() {
       {status === "err" && (
         <p className="alert err" role="alert">
           ✕ Sorry, your message failed to send. Please try again later.
+        </p>
+      )}
+      {status === "saved" && (
+        <p className="alert ok" role="status">
+          ✓ Your message was saved, but the email notification could not be
+          delivered. You do not need to submit it again.
         </p>
       )}
       <input

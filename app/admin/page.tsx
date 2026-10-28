@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "../../lib/prisma";
-import { markRead, remove, save } from "../actions";
+import { markRead, remove, save, saveAvailability } from "../actions";
 import { AdminNavigation } from "../../components/Navigation";
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ const Del = ({ kind, id }: { kind: string; id: string }) => (
 
 export default async function Admin({ searchParams }: { searchParams: Promise<{ tab?: string; edit?: string }> }) {
   const { tab = "messages", edit } = await searchParams;
-  const [messages, projects, posts] = await Promise.all([
+  const [messages, projects, posts, certifications, siteSetting] = await Promise.all([
     prisma.message.findMany({
       orderBy: { createdAt: "desc" },
       select: {
@@ -33,6 +33,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         summary: true,
         tag: true,
         url: true,
+        technologies: true,
         image: true,
         imageType: true,
       },
@@ -49,14 +50,35 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         imageType: true,
       },
     }),
+    prisma.certification.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, url: true, createdAt: true },
+    }),
+    prisma.siteSetting.findUnique({
+      where: { key: "availability" },
+      select: { available: true },
+    }),
   ]);
   const ep = projects.find((x) => x.id === edit);
   const eb = posts.find((x) => x.id === edit);
   const unread = messages.filter((m) => !m.read).length;
+  const isAvailable = siteSetting?.available ?? true;
 
   return (
     <div className="wrap" style={{ paddingBottom: 80 }}>
       <AdminNavigation tab={tab} unread={unread} />
+      <Link href="/" className="admin-home-link">← View portfolio</Link>
+      <form action={saveAvailability} className="availability-setting">
+        <span className={`availability-indicator${isAvailable ? " active" : ""}`} />
+        <span>
+          <strong>{isAvailable ? "Available for work" : "Not taking projects"}</strong>
+          <small className="muted">Controls the status shown on your portfolio</small>
+        </span>
+        <input type="hidden" name="available" value={String(!isAvailable)} />
+        <button className="ghost availability-toggle" type="submit">
+          {isAvailable ? "Set unavailable" : "Set available"}
+        </button>
+      </form>
 
       {tab === "messages" && (messages.length === 0 ? <p className="muted">No messages yet.</p> :
         messages.map((m) => (
@@ -76,6 +98,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           <textarea name="summary" rows={3} placeholder="Summary" defaultValue={ep?.summary} required />
           <input name="tag" placeholder="Tag (e.g. Web app)" defaultValue={ep?.tag} />
           <input name="url" placeholder="Project URL" defaultValue={ep?.url} />
+          <label>Tech stack (comma-separated, e.g. Next.js, TypeScript, Prisma)
+            <input name="technologies" placeholder="Next.js, TypeScript, Prisma" defaultValue={ep?.technologies} />
+          </label>
           <label>Project image (JPEG, PNG, WebP, or GIF; max 4 MB)
             <input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
           </label>
@@ -90,7 +115,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         {projects.map((p) => (
           <div className="card content-card" key={p.id}>
             {(p.imageType || p.image) && <img className="admin-thumbnail" src={p.imageType ? `/api/media/project/${p.id}` : p.image} alt="" />}
-            <div className="content-card-details"><b>{p.title}</b> <span className="muted">{p.tag}</span>{" "}
+            <div className="content-card-details"><b>{p.title}</b> <span className="muted">{p.tag}</span>
+              {p.technologies && <div className="tech-stack-chips">{p.technologies.split(",").filter(Boolean).map((technology) => <span className="tech-stack-chip" key={technology}>{technology.trim()}</span>)}</div>}
               <Link className="btn ghost" href={`/admin?tab=projects&edit=${p.id}`}>Edit</Link> <Del kind="project" id={p.id} /></div>
           </div>))}
       </>)}
@@ -120,6 +146,29 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <div className="content-card-details"><b>{p.title}</b> <span className="muted">{p.published ? "published" : "draft"}</span>{" "}
               <Link className="btn ghost" href={`/admin?tab=posts&edit=${p.id}`}>Edit</Link> <Del kind="post" id={p.id} /></div>
           </div>))}
+      </>)}
+
+      {tab === "certifications" && (<>
+        <form action={save} className="stack card">
+          <input type="hidden" name="kind" value="certification" />
+          <h3>Add a certification</h3>
+          <input name="name" placeholder="Certification name" maxLength={120} required />
+          <input name="url" type="url" placeholder="https://…" required />
+          <button>Add certification</button>
+        </form>
+        {certifications.length === 0 ? (
+          <p className="muted">No certifications yet.</p>
+        ) : certifications.map((certification) => (
+          <div className="card certification-admin-card" key={certification.id}>
+            <div>
+              <b>{certification.name}</b>
+              <a className="muted certification-admin-link" href={certification.url} target="_blank" rel="noreferrer">
+                {certification.url}
+              </a>
+            </div>
+            <Del kind="certification" id={certification.id} />
+          </div>
+        ))}
       </>)}
     </div>
   );
