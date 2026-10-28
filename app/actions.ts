@@ -46,8 +46,10 @@ export async function logout() {
   redirect("/admin/login");
 }
 
-export async function sendMessage(f: FormData): Promise<{ ok: boolean }> {
-  if (s(f, "website")) return { ok: true }; // honeypot: bots fill this in
+export async function sendMessage(
+  f: FormData,
+): Promise<{ ok: boolean; notificationSent?: boolean }> {
+  if (s(f, "website")) return { ok: true, notificationSent: true }; // honeypot: bots fill this in
   const name = s(f, "name").slice(0, 100),
     email = s(f, "email").slice(0, 200),
     body = s(f, "body").slice(0, 5000);
@@ -60,12 +62,14 @@ export async function sendMessage(f: FormData): Promise<{ ok: boolean }> {
     return { ok: false };
   }
   try {
-    await sendContactEmails({ name, email, body });
+    const { notificationSent } = await sendContactEmails({ name, email, body });
+    revalidatePath("/admin");
+    return { ok: true, notificationSent };
   } catch (e) {
-    console.error("Email error:", e);
+    console.error("Contact email delivery failed:", e);
+    revalidatePath("/admin");
+    return { ok: true, notificationSent: false };
   }
-  revalidatePath("/admin");
-  return { ok: true };
 }
 
 export async function save(f: FormData) {
@@ -96,7 +100,7 @@ export async function save(f: FormData) {
       published: f.get("published") === "on",
       ...(f.get("removeImage") === "on"
         ? { imageData: null, imageType: null }
-        : image ?? {}),
+        : (image ?? {})),
     };
     if (id) await prisma.post.update({ where: { id }, data });
     else await prisma.post.create({ data });
@@ -122,5 +126,17 @@ export async function markRead(f: FormData) {
     where: { id: s(f, "id") },
     data: { read: true },
   });
+  revalidatePath("/admin");
+}
+
+export async function saveAvailability(f: FormData) {
+  await requireAdmin();
+  const available = s(f, "available") === "true";
+  await prisma.siteSetting.upsert({
+    where: { key: "availability" },
+    create: { key: "availability", available },
+    update: { available },
+  });
+  revalidatePath("/");
   revalidatePath("/admin");
 }

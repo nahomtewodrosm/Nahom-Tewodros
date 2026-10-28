@@ -13,6 +13,7 @@ model Project {
   summary   String
   tag       String   @default("")
   url       String   @default("")
+  technologies String @default("")
   image     String   @default("")
   imageData Bytes?
   imageType String?
@@ -36,5 +37,17 @@ model Message {
   email     String
   body      String
   read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  key       String  @id @map("_id")
+  available Boolean @default(true)
+}
+
+model Certification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  url       String
   createdAt DateTime @default(now())
 }

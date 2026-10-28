@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { prisma } from "../lib/prisma";
 import ContactForm from "../components/ContactForm";
+import HeroShowcase from "../components/HeroShowcase";
 import { MainNavigation } from "../components/Navigation";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [projects, posts] = await Promise.all([
+  const [projects, posts, certifications, siteSetting] = await Promise.all([
     prisma.project.findMany({
       orderBy: { createdAt: "desc" },
       select: {
@@ -14,6 +15,7 @@ export default async function Home() {
         summary: true,
         tag: true,
         url: true,
+        technologies: true,
         image: true,
         imageType: true,
       },
@@ -29,29 +31,19 @@ export default async function Home() {
         imageType: true,
       },
     }),
+    prisma.certification.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, url: true },
+    }),
+    prisma.siteSetting.findUnique({
+      where: { key: "availability" },
+      select: { available: true },
+    }),
   ]);
   return (
     <div className="wrap">
       <MainNavigation />
-      <header className="hero">
-        <p className="label">Independent developer</p>
-        <h1>
-          Good design.
-          <br />
-          <em>Thoughtful</em> code.
-        </h1>
-        <p className="lede">
-          I create Stunning digital experiences with modern tech. Specializing
-          in building exceptional websites, applications, and everything in
-          between{" "}
-        </p>
-        <a className="btn" href="#work">
-          Explore my work
-        </a>{" "}
-        <a className="btn ghost" href="#about">
-          A little about me
-        </a>
-      </header>
+      <HeroShowcase isAvailable={siteSetting?.available ?? true} />
 
       <section id="about">
         <p className="label">01 / About</p>
@@ -83,6 +75,19 @@ export default async function Home() {
                 {p.tag && <small className="muted">[ {p.tag} ]</small>}
                 <h3>{p.title}</h3>
                 <p>{p.summary}</p>
+                {p.technologies && (
+                  <div className="tech-stack-chips" aria-label="Technologies used">
+                    {String(p.technologies).split(",").filter(Boolean).map((technology, index) => (
+                      <span
+                        className="tech-stack-chip"
+                        key={technology}
+                        style={{ "--chip-index": index } as React.CSSProperties}
+                      >
+                        {technology.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {p.url && (
                   <a
                     className="btn ghost"
@@ -90,7 +95,7 @@ export default async function Home() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Visit ↗
+                    Visit
                   </a>
                 )}
               </div>
@@ -122,17 +127,41 @@ export default async function Home() {
                 />
               )}
               <div>
-              <h3>{p.title}</h3>
-              <p>{p.excerpt}</p>
+                <h3>{p.title}</h3>
+                <p>{p.excerpt}</p>
               </div>
             </div>
-            <span>↗</span>
+            <span></span>
           </Link>
         ))}
       </section>
 
+      <section id="certifications">
+        <p className="label">04 / Certifications</p>
+        <h2>Learning, put into practice.</h2>
+        {certifications.length === 0 ? (
+          <p className="muted">New certifications will appear here.</p>
+        ) : (
+          <div className="certification-grid">
+            {certifications.map((certification) => (
+              <a
+                className="certification-card"
+                href={certification.url}
+                key={certification.id}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="certification-mark" aria-hidden="true">✳</span>
+                <span className="certification-name">{certification.name}</span>
+                <span className="certification-arrow" aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </section>
+
       <section id="contact">
-        <p className="label">04 / Contact</p>
+        <p className="label">05 / Contact</p>
         <h2>Make something good together.</h2>
         <ContactForm />
       </section>
