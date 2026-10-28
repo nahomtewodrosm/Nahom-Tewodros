@@ -79,8 +79,6 @@ export default function HeroShowcase({
           {isAvailable
             ? "Available for select projects"
             : "Not taking projects"}
-          <span aria-hidden="true">·</span>
-          From first sketch to final pixel
         </p>
         <div className="hero-actions">
           <a className="btn" href="#work">
@@ -88,6 +86,9 @@ export default function HeroShowcase({
           </a>
           <a className="btn ghost" href="#about">
             A little about me
+          </a>
+          <a className="btn ghost" href="/cv.pdf" download>
+            Download my CV
           </a>
         </div>
         <div className="tech-marquee" aria-label="Technology skills">

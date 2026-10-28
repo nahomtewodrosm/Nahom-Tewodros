@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "../lib/prisma";
 import { token } from "../lib/auth";
 import { sendContactEmails } from "../lib/mail";
+import { serializePostLinks } from "../lib/post-links";
 
 const s = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const imageTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -83,6 +84,12 @@ export async function save(f: FormData) {
       summary: s(f, "summary"),
       tag: s(f, "tag"),
       url: s(f, "url"),
+      technologies: s(f, "technologies")
+        .split(/[,\n]/)
+        .map((technology) => technology.trim())
+        .filter(Boolean)
+        .slice(0, 12)
+        .join(", "),
       ...(f.get("removeImage") === "on"
         ? { image: "", imageData: null, imageType: null }
         : image
@@ -98,15 +105,33 @@ export async function save(f: FormData) {
       excerpt: s(f, "excerpt"),
       content: s(f, "content"),
       published: f.get("published") === "on",
+      links: serializePostLinks(s(f, "links")),
       ...(f.get("removeImage") === "on"
         ? { imageData: null, imageType: null }
         : (image ?? {})),
     };
     if (id) await prisma.post.update({ where: { id }, data });
     else await prisma.post.create({ data });
+  } else if (kind === "certification") {
+    const name = s(f, "name").slice(0, 120);
+    const url = s(f, "url");
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      throw new Error("Enter a valid certification URL.");
+    }
+    if (!name || !["http:", "https:"].includes(parsedUrl.protocol))
+      throw new Error("Enter a name and a valid HTTP or HTTPS certification URL.");
+    await prisma.certification.create({
+      data: { name, url: parsedUrl.toString() },
+    });
+  } else {
+    throw new Error("Unknown content type.");
   }
   revalidatePath("/");
-  redirect(`/admin?tab=${kind}s`);
+  revalidatePath("/admin");
+  redirect(`/admin?tab=${kind === "certification" ? "certifications" : `${kind}s`}`);
 }
 
 export async function remove(f: FormData) {
@@ -116,6 +141,10 @@ export async function remove(f: FormData) {
   if (kind === "project") await prisma.project.delete({ where: { id } });
   if (kind === "post") await prisma.post.delete({ where: { id } });
   if (kind === "message") await prisma.message.delete({ where: { id } });
+  if (kind === "certification")
+    await prisma.certification.delete({ where: { id } });
+  if (!["project", "post", "message", "certification"].includes(kind))
+    throw new Error("Unknown content type.");
   revalidatePath("/");
   revalidatePath("/admin");
 }

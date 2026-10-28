@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "../../../lib/prisma";
+import { parsePostLinks } from "../../../lib/post-links";
 export const dynamic = "force-dynamic";
 
 export default async function Post({ params }: { params: Promise<{ id: string }> }) {
@@ -14,9 +15,11 @@ export default async function Post({ params }: { params: Promise<{ id: string }>
       published: true,
       createdAt: true,
       imageType: true,
+      links: true,
     },
   }).catch(() => null);
   if (!post || !post.published) notFound();
+  const links = parsePostLinks(post.links ?? "[]");
   return (
     <div className="wrap" style={{ maxWidth: 720, padding: "60px 24px" }}>
       <Link href="/#notes" className="muted">← Back</Link>
@@ -30,6 +33,15 @@ export default async function Post({ params }: { params: Promise<{ id: string }>
         />
       )}
       <div style={{ whiteSpace: "pre-wrap" }}>{post.content}</div>
+      {links.length > 0 && (
+        <nav className="post-social-links" aria-label="Post links">
+          {links.map(({ label, url }) => (
+            <a className="btn ghost" href={url} key={url} target="_blank" rel="noreferrer">
+              {label}
+            </a>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }

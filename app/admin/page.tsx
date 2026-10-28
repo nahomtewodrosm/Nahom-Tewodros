@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "../../lib/prisma";
 import { markRead, remove, save, saveAvailability } from "../actions";
 import { AdminNavigation } from "../../components/Navigation";
+import SharePostButton from "../../components/SharePostButton";
+import { formatPostLinks } from "../../lib/post-links";
 export const dynamic = "force-dynamic";
 
 const Del = ({ kind, id }: { kind: string; id: string }) => (
@@ -46,6 +48,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         excerpt: true,
         content: true,
         published: true,
+        links: true,
         createdAt: true,
         imageType: true,
       },
@@ -91,15 +94,15 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           </div>)))}
 
       {tab === "projects" && (<>
-        <form action={save} className="stack card" encType="multipart/form-data">
+        <form action={save} className="stack card">
           <input type="hidden" name="kind" value="project" /><input type="hidden" name="id" value={ep?.id ?? ""} />
           <h3>{ep ? "Edit project" : "New project"}</h3>
           <input name="title" placeholder="Title" defaultValue={ep?.title} required />
           <textarea name="summary" rows={3} placeholder="Summary" defaultValue={ep?.summary} required />
           <input name="tag" placeholder="Tag (e.g. Web app)" defaultValue={ep?.tag} />
           <input name="url" placeholder="Project URL" defaultValue={ep?.url} />
-          <label>Tech stack (comma-separated, e.g. Next.js, TypeScript, Prisma)
-            <input name="technologies" placeholder="Next.js, TypeScript, Prisma" defaultValue={ep?.technologies} />
+          <label>Tech stack (separate names with commas or new lines)
+            <textarea name="technologies" rows={2} placeholder={"Next.js, TypeScript\nPrisma"} defaultValue={ep?.technologies} />
           </label>
           <label>Project image (JPEG, PNG, WebP, or GIF; max 4 MB)
             <input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
@@ -122,12 +125,15 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       </>)}
 
       {tab === "posts" && (<>
-        <form action={save} className="stack card" encType="multipart/form-data">
+        <form action={save} className="stack card">
           <input type="hidden" name="kind" value="post" /><input type="hidden" name="id" value={eb?.id ?? ""} />
           <h3>{eb ? "Edit post" : "New post"}</h3>
           <input name="title" placeholder="Title" defaultValue={eb?.title} required />
           <input name="excerpt" placeholder="Short excerpt" defaultValue={eb?.excerpt} />
           <textarea name="content" rows={12} placeholder="Write your post…" defaultValue={eb?.content} required />
+          <label>Social links (one per line: platform | URL)
+            <textarea name="links" rows={3} placeholder={"X | https://x.com/…\nLinkedIn | https://linkedin.com/…"} defaultValue={formatPostLinks(eb?.links ?? "[]")} />
+          </label>
           <label>Post image (JPEG, PNG, WebP, or GIF; max 4 MB)
             <input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
           </label>
@@ -144,6 +150,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           <div className="card content-card" key={p.id}>
             {p.imageType && <img className="admin-thumbnail" src={`/api/media/post/${p.id}`} alt="" />}
             <div className="content-card-details"><b>{p.title}</b> <span className="muted">{p.published ? "published" : "draft"}</span>{" "}
+              {p.published && <SharePostButton postId={p.id} />}{" "}
               <Link className="btn ghost" href={`/admin?tab=posts&edit=${p.id}`}>Edit</Link> <Del kind="post" id={p.id} /></div>
           </div>))}
       </>)}
