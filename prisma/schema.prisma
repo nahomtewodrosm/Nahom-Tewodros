@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  summary   String
+  tag       String   @default("")
+  url       String   @default("")
+  image     String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  excerpt   String   @default("")
+  content   String
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
