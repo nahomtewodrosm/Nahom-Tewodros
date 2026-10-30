@@ -1,0 +1,185 @@
+.mainNav {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+}
+
+.brand {
+  min-width: 0;
+}
+
+.brand img {
+  width: 68px;
+  height: 68px;
+}
+
+.desktopLinks {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  padding: 5px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 3%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 4%);
+}
+
+.desktopLinks a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 11px;
+  border-radius: 999px;
+  color: #c9c5bf;
+  font-size: 12px;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.desktopLinks a:hover,
+.desktopLinks a:focus-visible {
+  background: rgb(255 255 255 / 7%);
+  color: var(--fg);
+}
+
+.desktopLinks .adminLink {
+  margin-left: 3px;
+  background: var(--acc);
+  color: #141414;
+  font-weight: 650;
+}
+
+.desktopLinks .adminLink:hover,
+.desktopLinks .adminLink:focus-visible {
+  background: #ff7447;
+  color: #141414;
+}
+
+.menuToggle {
+  display: none;
+}
+
+.mobileLinks {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% - 5px);
+  right: 0;
+  display: grid;
+  width: min(360px, calc(100vw - 36px));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 20px;
+  background: #191817;
+  box-shadow:
+    0 20px 55px rgb(0 0 0 / 48%),
+    inset 0 1px rgb(255 255 255 / 5%);
+  animation: menu-arrive 180ms ease-out both;
+}
+
+.mobileLinks a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid rgb(255 255 255 / 6%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 3%);
+  color: #dedad4;
+  font-size: 13px;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.mobileLinks a:hover,
+.mobileLinks a:focus-visible {
+  border-color: rgb(255 90 31 / 38%);
+  background: rgb(255 90 31 / 8%);
+  color: var(--acc);
+}
+
+.mobileLinks .mobileAdminLink {
+  grid-column: 1 / -1;
+  justify-content: center;
+  border-color: transparent;
+  background: var(--acc);
+  color: #141414;
+  font-weight: 650;
+}
+
+.mobileLinks .mobileAdminLink:hover,
+.mobileLinks .mobileAdminLink:focus-visible {
+  background: #ff7447;
+  color: #141414;
+}
+
+@keyframes menu-arrive {
+  from {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 940px) {
+  .mainNav {
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .brand img {
+    width: 58px;
+    height: 58px;
+  }
+
+  .desktopLinks {
+    display: none;
+  }
+
+  .menuToggle {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0 17px;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 5%);
+    color: var(--fg);
+    font: 600 13px system-ui, sans-serif;
+    cursor: pointer;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .menuToggle:hover,
+  .menuToggle:focus-visible {
+    border-color: rgb(255 90 31 / 48%);
+    background: rgb(255 90 31 / 10%);
+    outline: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileLinks {
+    animation: none;
+  }
+}

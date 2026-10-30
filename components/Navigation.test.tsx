@@ -6,6 +6,19 @@ jest.mock("../app/actions", () => ({
 }));
 
 describe("MainNavigation", () => {
+  it("uses compact labels for the section links", () => {
+    render(<MainNavigation />);
+
+    expect(screen.getByRole("link", { name: "Journey" })).toHaveAttribute(
+      "href",
+      "#experience",
+    );
+    expect(screen.getByRole("link", { name: "Certs" })).toHaveAttribute(
+      "href",
+      "#certifications",
+    );
+  });
+
   it("opens the mobile menu and closes it after selecting a link", () => {
     render(<MainNavigation />);
 
