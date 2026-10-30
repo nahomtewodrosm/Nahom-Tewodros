@@ -94,7 +94,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           </div>)))}
 
       {tab === "projects" && (<>
-        <form action={save} className="stack card">
+        <form action={save} className="stack card" encType="multipart/form-data">
           <input type="hidden" name="kind" value="project" /><input type="hidden" name="id" value={ep?.id ?? ""} />
           <h3>{ep ? "Edit project" : "New project"}</h3>
           <input name="title" placeholder="Title" defaultValue={ep?.title} required />
