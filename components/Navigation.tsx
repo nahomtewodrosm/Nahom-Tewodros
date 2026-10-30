@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { logout } from "../app/actions";
+import styles from "./Navigation.module.css";
 
 const mainLinks = [
   ["Work", "#work"],
   ["About", "#about"],
-  ["Experience", "#experience"],
+  ["Journey", "#experience"],
   ["Notes", "#notes"],
-  ["Certifications", "#certifications"],
+  ["Certs", "#certifications"],
   ["Contact", "#contact"],
 ] as const;
 
@@ -19,20 +20,22 @@ export function MainNavigation() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="site-nav">
-      <Link href="/" className="logo">
+    <nav className={styles.mainNav} aria-label="Main navigation">
+      <Link href="/" className={`${styles.brand} logo`}>
         <img src="/logo.gif" alt="Nahom Tewodros" />
       </Link>
-      <div className="desktop-nav">
+      <div className={styles.desktopLinks}>
         {mainLinks.map(([label, href]) => (
           <a href={href} key={href}>
             {label}
           </a>
         ))}
-        <Link href="/admin">Admin</Link>
+        <Link href="/admin" className={styles.adminLink}>
+          Admin
+        </Link>
       </div>
       <button
-        className="mobile-menu-toggle"
+        className={styles.menuToggle}
         type="button"
         aria-expanded={menuOpen}
         aria-controls="main-mobile-menu"
@@ -41,13 +44,17 @@ export function MainNavigation() {
         {menuOpen ? "Close" : "Menu"}
       </button>
       {menuOpen && (
-        <div className="mobile-menu" id="main-mobile-menu">
+        <div className={styles.mobileLinks} id="main-mobile-menu">
           {mainLinks.map(([label, href]) => (
             <a href={href} key={href} onClick={() => setMenuOpen(false)}>
               {label}
             </a>
           ))}
-          <Link href="/admin" onClick={() => setMenuOpen(false)}>
+          <Link
+            href="/admin"
+            className={styles.mobileAdminLink}
+            onClick={() => setMenuOpen(false)}
+          >
             Admin
           </Link>
         </div>
