@@ -1,5 +1,6 @@
 // @ts-ignore -- Next.js loads global CSS at runtime; TypeScript may lack CSS declarations.
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 export const metadata = {
   title: "NAHOM TEWODROS",
   description: "Portfolio",

@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma";
 import ContactForm from "../components/ContactForm";
+import LocationMap from "../components/LocationMap";
 import CertificationCarousel from "../components/CertificationCarousel";
 import ExperienceTimeline from "../components/ExperienceTimeline";
 import HeroShowcase from "../components/HeroShowcase";
@@ -239,9 +240,14 @@ export default async function Home() {
               className="contact-orbit contact-orbit-two"
               aria-hidden="true"
             />
-            <div className="contact-visual-copy">
-              <span className="contact-kicker">Have a good one in mind?</span>
-              <p>Let’s turn it into something real.</p>
+            <div className="contact-location">
+              <div className="contact-visual-copy">
+                <span className="contact-kicker">Currently based in</span>
+                <p>Addis Ababa, Ethiopia</p>
+              </div>
+              <div className="contact-map-frame">
+                <LocationMap />
+              </div>
             </div>
             <div className="contact-quick-links">
               <span>Find me elsewhere</span>
