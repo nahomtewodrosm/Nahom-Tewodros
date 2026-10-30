@@ -1,5 +1,4 @@
 {
   "/api/media/[kind]/[id]/route": "app/api/media/[kind]/[id]/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/page": "app/page.js"
 }

@@ -126,6 +126,27 @@ export async function save(f: FormData) {
     await prisma.certification.create({
       data: { name, url: parsedUrl.toString() },
     });
+  } else if (kind === "testimonial") {
+    const image = await uploadedImage(f);
+    const name = s(f, "name").slice(0, 100);
+    const role = s(f, "role").slice(0, 120);
+    const company = s(f, "company").slice(0, 120);
+    const quote = s(f, "quote").slice(0, 1200);
+    if (!name || !role || !company || !quote)
+      throw new Error("Enter the testimonial and its author details.");
+    if (!id && !image)
+      throw new Error("Upload a photo for the testimonial.");
+    const data = {
+      name,
+      role,
+      company,
+      quote,
+      ...(f.get("removeImage") === "on"
+        ? { imageData: null, imageType: null }
+        : (image ?? {})),
+    };
+    if (id) await prisma.testimonial.update({ where: { id }, data });
+    else await prisma.testimonial.create({ data });
   } else {
     throw new Error("Unknown content type.");
   }
@@ -143,7 +164,13 @@ export async function remove(f: FormData) {
   if (kind === "message") await prisma.message.delete({ where: { id } });
   if (kind === "certification")
     await prisma.certification.delete({ where: { id } });
-  if (!["project", "post", "message", "certification"].includes(kind))
+  if (kind === "testimonial")
+    await prisma.testimonial.delete({ where: { id } });
+  if (
+    !["project", "post", "message", "certification", "testimonial"].includes(
+      kind,
+    )
+  )
     throw new Error("Unknown content type.");
   revalidatePath("/");
   revalidatePath("/admin");

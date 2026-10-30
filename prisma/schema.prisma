@@ -52,3 +52,14 @@ model Certification {
   url       String
   createdAt DateTime @default(now())
 }
+
+model Testimonial {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  role      String
+  company   String
+  quote     String
+  imageData Bytes?
+  imageType String?
+  createdAt DateTime @default(now())
+}

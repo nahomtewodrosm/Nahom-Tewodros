@@ -16,7 +16,6 @@ export default function ExperienceTimeline({
 }) {
   const timelineRef = useRef<HTMLDivElement>(null);
   const [activeItems, setActiveItems] = useState<Set<number>>(() => new Set());
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const timeline = timelineRef.current;
@@ -47,9 +46,24 @@ export default function ExperienceTimeline({
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const bounds = timeline.getBoundingClientRect();
-        const travel = bounds.height + window.innerHeight * 0.65;
-        const distance = window.innerHeight * 0.65 - bounds.top;
-        setProgress(Math.max(0, Math.min(1, distance / travel)));
+        const markers = timeline.querySelectorAll<HTMLElement>(
+          ".experience-marker",
+        );
+        const firstMarker = markers[0];
+        const lastMarker = markers[markers.length - 1];
+        if (!firstMarker || !lastMarker) return;
+
+        const firstBounds = firstMarker.getBoundingClientRect();
+        const lastBounds = lastMarker.getBoundingClientRect();
+        const start = firstBounds.top + firstBounds.height / 2 - bounds.top;
+        const end = lastBounds.top + lastBounds.height / 2 - bounds.top;
+        const trackLength = Math.max(0, end - start);
+        const scrollPosition = window.innerHeight * 0.65 - bounds.top;
+        const fill = Math.max(0, Math.min(trackLength, scrollPosition - start));
+
+        timeline.style.setProperty("--timeline-start", `${start}px`);
+        timeline.style.setProperty("--timeline-length", `${trackLength}px`);
+        timeline.style.setProperty("--timeline-progress", `${fill}px`);
       });
     };
 
@@ -69,7 +83,6 @@ export default function ExperienceTimeline({
     <div
       className="experience-list"
       ref={timelineRef}
-      style={{ "--timeline-progress": `${progress * 100}%` } as React.CSSProperties}
     >
       {items.map((item, index) => (
         <article

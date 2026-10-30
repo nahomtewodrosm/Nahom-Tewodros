@@ -50,7 +50,7 @@ export async function sendContactEmails(m: {
       subject: "I received your message",
       text: `Hi ${m.name},\n\nThanks for reaching out! I've received your message and will get back to you soon.\n\n— ${site}`,
       html: `
-  <div style="margin:0;padding:0;background:linear-gradient(135deg, #f5a623 0%, #e68f32 50%, #c46a1a 100%);font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
       <tr>
         <td align="center">
@@ -82,10 +82,15 @@ export async function sendContactEmails(m: {
   results.forEach((result, index) => {
     if (result.status === "rejected") {
       const error = result.reason as { code?: string; responseCode?: number };
-      console.error(index === 0 ? "Admin notification email failed" : "Contact auto-reply failed", {
-        code: error.code,
-        responseCode: error.responseCode,
-      });
+      console.error(
+        index === 0
+          ? "Admin notification email failed"
+          : "Contact auto-reply failed",
+        {
+          code: error.code,
+          responseCode: error.responseCode,
+        },
+      );
     }
   });
   return { notificationSent: results[0].status === "fulfilled" };
