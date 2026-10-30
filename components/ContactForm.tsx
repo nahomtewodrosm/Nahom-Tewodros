@@ -24,7 +24,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="stack">
+    <form onSubmit={onSubmit} className="stack contact-form">
       {status === "ok" && (
         <p className="alert ok" role="status">
           ✓ Thank you! Your message was sent successfully. I’ll get back to you
@@ -49,16 +49,34 @@ export default function ContactForm() {
         aria-hidden
         style={{ position: "absolute", left: "-9999px" }}
       />
-      <input name="name" placeholder="Your name" required />
-      <input name="email" type="email" placeholder="Your email" required />
+      <label className="contact-field">
+        <span>Your name</span>
+        <input
+          name="name"
+          placeholder="Your name"
+          autoComplete="name"
+          required
+        />
+      </label>
+      <label className="contact-field">
+        <span>Your email</span>
+        <input
+          name="email"
+          type="email"
+          placeholder="Your email"
+          autoComplete="email"
+          required
+        />
+      </label>
       <textarea
         name="body"
         rows={5}
         placeholder="What's on your mind?"
+        aria-label="Your message"
         required
       />
       <button disabled={status === "sending"}>
-        {status === "sending" ? "Sending…" : "Send message ↗"}
+        {status === "sending" ? "Sending…" : "Send message"}
       </button>
     </form>
   );

@@ -26,7 +26,7 @@ describe("ContactForm", () => {
     fireEvent.change(screen.getByPlaceholderText("What's on your mind?"), {
       target: { value: "Hello" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send message ↗" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
 
     expect(await screen.findByText(/message was saved/i)).toBeInTheDocument();
     expect(mockedSendMessage).toHaveBeenCalledTimes(1);
@@ -45,7 +45,7 @@ describe("ContactForm", () => {
     fireEvent.change(screen.getByPlaceholderText("What's on your mind?"), {
       target: { value: "Hello" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send message ↗" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(

@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { prisma } from "../lib/prisma";
 import ContactForm from "../components/ContactForm";
-import CertificationCard from "../components/CertificationCard";
+import CertificationCarousel from "../components/CertificationCarousel";
 import ExperienceTimeline from "../components/ExperienceTimeline";
 import HeroShowcase from "../components/HeroShowcase";
 import NotesList from "../components/NotesList";
 import ProjectCard from "../components/ProjectCard";
+import SkillsShowcase from "../components/SkillsShowcase";
 import { MainNavigation } from "../components/Navigation";
 export const dynamic = "force-dynamic";
 
@@ -41,40 +41,52 @@ const experience = [
 ];
 
 export default async function Home() {
-  const [projects, posts, certifications, siteSetting] = await Promise.all([
-    prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        summary: true,
-        tag: true,
-        url: true,
-        technologies: true,
-        image: true,
-        imageType: true,
-      },
-    }),
-    prisma.post.findMany({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        excerpt: true,
-        createdAt: true,
-        imageType: true,
-      },
-    }),
-    prisma.certification.findMany({
-      orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, url: true },
-    }),
-    prisma.siteSetting.findUnique({
-      where: { key: "availability" },
-      select: { available: true },
-    }),
-  ]);
+  const [projects, posts, certifications, testimonials, siteSetting] =
+    await Promise.all([
+      prisma.project.findMany({
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          title: true,
+          summary: true,
+          tag: true,
+          url: true,
+          technologies: true,
+          image: true,
+          imageType: true,
+        },
+      }),
+      prisma.post.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          title: true,
+          excerpt: true,
+          createdAt: true,
+          imageType: true,
+        },
+      }),
+      prisma.certification.findMany({
+        orderBy: { createdAt: "desc" },
+        select: { id: true, name: true, url: true },
+      }),
+      prisma.testimonial.findMany({
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          company: true,
+          quote: true,
+          imageType: true,
+        },
+      }),
+      prisma.siteSetting.findUnique({
+        where: { key: "availability" },
+        select: { available: true },
+      }),
+    ]);
   return (
     <div className="wrap">
       <MainNavigation />
@@ -144,7 +156,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="notes">
+      <section id="the ">
         <p className="label">04 / Notes</p>
         <h2>Thinking out loud.</h2>
         {posts.length === 0 && <p className="muted">No posts yet.</p>}
@@ -154,30 +166,107 @@ export default async function Home() {
       <section id="certifications">
         <p className="label">05 / Certifications</p>
         <h2>Learning, put into practice.</h2>
+        <p className="muted ">
+          Scroll to view all certifications Then move on to next section
+        </p>
         {certifications.length === 0 ? (
           <p className="muted">New certifications will appear here.</p>
         ) : (
-          <div className="certification-grid">
-            {certifications.map((certification) => (
-              <CertificationCard
-                key={certification.id}
-                name={certification.name}
-                url={certification.url}
-              />
+          <CertificationCarousel certifications={certifications} />
+        )}
+      </section>
+
+      <section id="skills">
+        <p className="label">06 / Skills</p>
+        <h2>The tools and habits behind the work.</h2>
+        <SkillsShowcase />
+      </section>
+
+      <section id="testimonials">
+        <p className="label">07 / Testimonials</p>
+        <h2>Kind words from people I’ve worked with.</h2>
+        {testimonials.length === 0 ? (
+          <p className="muted">
+            Testimonials will appear here once they’re added in Admin.
+          </p>
+        ) : (
+          <div className="testimonials-grid">
+            {testimonials.map((testimonial) => (
+              <article className="testimonial-card" key={testimonial.id}>
+                <span className="testimonial-quote-mark" aria-hidden="true">
+                  “
+                </span>
+                <blockquote>{testimonial.quote}</blockquote>
+                <div className="testimonial-author">
+                  {testimonial.imageType ? (
+                    <img
+                      src={`/api/media/testimonial/${testimonial.id}`}
+                      alt=""
+                      className="testimonial-avatar"
+                    />
+                  ) : (
+                    <span
+                      className="testimonial-avatar testimonial-avatar-fallback"
+                      aria-hidden="true"
+                    >
+                      {testimonial.name.slice(0, 1)}
+                    </span>
+                  )}
+                  <div>
+                    <strong>{testimonial.name}</strong>
+                    <span>
+                      {testimonial.role} · {testimonial.company}
+                    </span>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
         )}
       </section>
 
       <section id="contact">
-        <p className="label">06 / Contact</p>
-        <h2>Make something good together.</h2>
-        <ContactForm />
+        <p className="label">08 / Contact</p>
+        <h2>Lets Make something good together.</h2>
+        <div className="contact-layout">
+          <ContactForm />
+          <aside className="contact-visual">
+            <div
+              className="contact-orbit contact-orbit-one"
+              aria-hidden="true"
+            />
+            <div
+              className="contact-orbit contact-orbit-two"
+              aria-hidden="true"
+            />
+            <div className="contact-visual-copy">
+              <span className="contact-kicker">Have a good one in mind?</span>
+              <p>Let’s turn it into something real.</p>
+            </div>
+            <div className="contact-quick-links">
+              <span>Find me elsewhere</span>
+              <a href="mailto:nahomtewodros@gmail.com">
+                Email <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://github.com/Nahomtewodros101"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/nahom-tewodros"
+                target="_blank"
+                rel="noreferrer"
+              >
+                LinkedIn <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </aside>
+        </div>
       </section>
-      <footer>
-        © {new Date().getFullYear()} Your Name ·{" "}
-        <Link href="/admin">Admin</Link>
-      </footer>
+      <footer>© {new Date().getFullYear()} Nahom Tewodros </footer>
     </div>
   );
 }

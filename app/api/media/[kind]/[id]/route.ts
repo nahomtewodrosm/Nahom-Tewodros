@@ -25,7 +25,12 @@ export async function GET(
             where: { id },
             select: { imageData: true, imageType: true },
           })
-        : null;
+        : kind === "testimonial"
+          ? await prisma.testimonial.findUnique({
+              where: { id },
+              select: { imageData: true, imageType: true },
+            })
+          : null;
 
   if (
     !record?.imageData ||
