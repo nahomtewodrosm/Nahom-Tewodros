@@ -936,7 +936,7 @@ footer {
     color: var(--acc);
   }
   .availability-setting {
-    align-items: flex-start;
+    align-items: center;
     flex-wrap: wrap;
   }
   .availability-toggle {

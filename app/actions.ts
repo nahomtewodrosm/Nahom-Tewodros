@@ -90,10 +90,10 @@ export async function save(f: FormData) {
         .filter(Boolean)
         .slice(0, 12)
         .join(", "),
-      ...(f.get("removeImage") === "on"
-        ? { image: "", imageData: null, imageType: null }
-        : image
-          ? { image: "", ...image }
+      ...(image
+        ? { image: "", ...image }
+        : f.get("removeImage") === "on"
+          ? { image: "", imageData: null, imageType: null }
           : {}),
     };
     if (id) await prisma.project.update({ where: { id }, data });

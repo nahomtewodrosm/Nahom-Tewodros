@@ -11,10 +11,18 @@ const mainLinks = [
   ["Journey", "#experience"],
   ["Notes", "#notes"],
   ["Certs", "#certifications"],
+  ["Skills", "#skills"],
+  ["Praise", "#testimonials"],
   ["Contact", "#contact"],
 ] as const;
 
-const adminTabs = ["messages", "projects", "posts", "certifications"] as const;
+const adminTabs = [
+  "messages",
+  "projects",
+  "posts",
+  "certifications",
+  "testimonials",
+] as const;
 
 export function MainNavigation() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,7 +30,10 @@ export function MainNavigation() {
   return (
     <nav className={styles.mainNav} aria-label="Main navigation">
       <Link href="/" className={`${styles.brand} logo`}>
-        <img src="/logo.gif" alt="Nahom Tewodros" />
+        <img
+          src="/Black and Grey Gothic Urban Clothing Logo.gif"
+          alt="Nahom Tewodros"
+        />
       </Link>
       <div className={styles.desktopLinks}>
         {mainLinks.map(([label, href]) => (
