@@ -87,7 +87,7 @@ SESSION_SECRET="replace-with-a-long-random-secret"
 
 `DATABASE_URL`, `ADMIN_PASSWORD`, and `SESSION_SECRET` are required for database access and protected admin sessions. Keep secrets in `.env` or your hosting provider’s environment settings; never commit them.
 
-The hero’s **Currently working on** card checks GitHub every five minutes and displays the account’s most recently pushed repository, its latest default-branch commit message, and deployment homepage (when configured). `CURRENT_WORK_GITHUB_USERNAME` defaults to `nahomtewodrosm`. To include private repositories such as Affiliate Hub, set `CURRENT_WORK_GITHUB_TOKEN` in the deployment environment to a token with read-only metadata and contents access to those repositories. Keep the token secret. If GitHub cannot be reached, the optional `CURRENT_WORK_PROJECT`, `CURRENT_WORK_URL`, `CURRENT_WORK_COMMIT_HASH`, and `CURRENT_WORK_COMMIT_MESSAGE` variables provide a manual fallback.
+The hero’s **Currently working on** card searches commits across the account’s repositories and branches every five minutes, displaying the latest authored commit, its repository, and deployment homepage (when configured). `CURRENT_WORK_GITHUB_USERNAME` defaults to `nahomtewodrosm`. To include private repositories such as Affiliate Hub, set `CURRENT_WORK_GITHUB_TOKEN` in the deployment environment to a token with read-only metadata and contents access to those repositories. Keep the token secret. Without a token, GitHub only returns public repositories. If GitHub cannot be reached, the optional `CURRENT_WORK_PROJECT`, `CURRENT_WORK_URL`, `CURRENT_WORK_COMMIT_HASH`, and `CURRENT_WORK_COMMIT_MESSAGE` variables provide a manual fallback.
 
 Email notifications are optional. To enable them, also set:
 
