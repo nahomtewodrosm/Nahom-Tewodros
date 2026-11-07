@@ -282,6 +282,131 @@ h1 em {
   gap: 12px;
   margin-top: 24px;
 }
+.current-work {
+  width: min(100%, 520px);
+  margin-top: 28px;
+  padding: 18px 20px;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at top left, rgb(255 90 31 / 9%), transparent 68%),
+    rgb(255 255 255 / 2%);
+  box-shadow:
+    0 16px 40px rgb(0 0 0 / 16%),
+    inset 0 1px rgb(255 255 255 / 4%);
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+.current-work:hover {
+  border-color: rgb(255 90 31 / 42%);
+  transform: translateY(-2px);
+}
+.current-work-heading,
+.current-work-commit summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.current-work-label,
+.current-work-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mute);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.current-work-label > span {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #83c98b;
+  box-shadow: 0 0 12px rgb(131 201 139 / 55%);
+  animation: current-work-pulse 2.4s ease-in-out infinite;
+}
+.current-work-status {
+  color: var(--acc);
+  font-size: 10px;
+}
+.current-work-title {
+  margin: 12px 0 4px;
+  font: 600 clamp(20px, 3vw, 25px)/1.2 Georgia, serif;
+  letter-spacing: -0.02em;
+}
+.current-work-deployment {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 8px;
+  color: #c9c5bf;
+  font-size: 13px;
+  transition: color 180ms ease;
+}
+.current-work-deployment-label {
+  flex: 0 0 auto;
+  color: var(--mute);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.current-work-url {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.current-work-deployment:hover,
+.current-work-deployment:focus-visible {
+  color: var(--acc);
+}
+.current-work-commit {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  color: var(--mute);
+  font-size: 12px;
+}
+.current-work-commit summary {
+  width: fit-content;
+  min-height: 28px;
+  cursor: pointer;
+  list-style: none;
+}
+.current-work-commit summary::-webkit-details-marker {
+  display: none;
+}
+.current-work-commit summary::after {
+  color: var(--acc);
+  content: "+";
+  font-size: 16px;
+  line-height: 1;
+}
+.current-work-commit[open] summary::after {
+  content: "−";
+}
+.current-work-commit summary:focus-visible,
+.current-work-deployment:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+}
+.current-work-commit code {
+  color: var(--fg);
+  font: 12px monospace;
+}
+.current-work-commit p {
+  max-width: 100%;
+  margin-top: 8px;
+  color: #c9c5bf;
+  overflow-wrap: anywhere;
+}
+@keyframes current-work-pulse {
+  50% {
+    box-shadow: 0 0 4px rgb(131 201 139 / 30%);
+    opacity: 0.65;
+  }
+}
 .tech-marquee {
   position: relative;
   width: min(100%, 680px);
@@ -1276,6 +1401,9 @@ form.stack.contact-form {
   }
 }
 @media (max-width: 640px) {
+  .current-work {
+    padding: 16px;
+  }
   .certification-grid > .certification-card {
     flex-basis: min(82vw, 300px);
   }
@@ -1527,6 +1655,14 @@ form.stack.contact-form {
   }
   .hero-light {
     display: none;
+  }
+  .current-work,
+  .current-work-label > span {
+    animation: none;
+    transition: none;
+  }
+  .current-work:hover {
+    transform: none;
   }
   .desktop-nav a::before,
   .mobile-menu a::before,
