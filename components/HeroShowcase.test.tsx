@@ -1,11 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import HeroShowcase from "./HeroShowcase";
 
 const currentWork = {
   projectName: "Portfolio website",
   deploymentUrl: "https://example.com",
+  deploymentLabel: "Deployment",
   commitHash: "a1b2c3d4e5f6",
   commitMessage: "Add the current work card to the hero.",
+  commitUrl: "https://github.com/example/portfolio/commit/a1b2c3d4e5f6",
 };
 
 describe("HeroShowcase", () => {
@@ -23,7 +25,7 @@ describe("HeroShowcase", () => {
     expect(status()).toHaveTextContent("Not taking projects");
   });
 
-  it("shows the configured project, deployment, and expandable commit details", () => {
+  it("shows the project, deployment, and commit message without interaction", () => {
     render(<HeroShowcase isAvailable currentWork={currentWork} />);
 
     expect(
@@ -36,10 +38,13 @@ describe("HeroShowcase", () => {
     expect(deploymentLink).toHaveTextContent("https://example.com");
     expect(screen.getByText("a1b2c3d")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Latest commit"));
+    expect(screen.getByText("Latest commit")).toBeInTheDocument();
     expect(
       screen.getByText("Add the current work card to the hero."),
-    ).toBeInTheDocument();
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /view commit/i }),
+    ).toHaveAttribute("href", currentWork.commitUrl);
   });
 
   it("does not invent commit information when none is configured", () => {
@@ -54,10 +59,11 @@ describe("HeroShowcase", () => {
       />,
     );
 
-    expect(screen.getByText("Not configured")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Latest commit"));
     expect(
       screen.getByText("Commit details have not been configured yet."),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /view commit/i }),
+    ).not.toBeInTheDocument();
   });
 });

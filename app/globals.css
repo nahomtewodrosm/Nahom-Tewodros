@@ -303,7 +303,7 @@ h1 em {
   transform: translateY(-2px);
 }
 .current-work-heading,
-.current-work-commit summary {
+.current-work-commit-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -364,42 +364,44 @@ h1 em {
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid rgb(255 255 255 / 8%);
+}
+.current-work-commit-label {
   color: var(--mute);
-  font-size: 12px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
-.current-work-commit summary {
-  width: fit-content;
-  min-height: 28px;
-  cursor: pointer;
-  list-style: none;
+.current-work-commit-message {
+  margin-top: 6px;
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
-.current-work-commit summary::-webkit-details-marker {
-  display: none;
+.current-work-commit-meta {
+  justify-content: flex-start;
+  gap: 14px;
+  margin-top: 9px;
 }
-.current-work-commit summary::after {
+.current-work-commit-meta code {
+  color: var(--mute);
+  font: 11px monospace;
+}
+.current-work-commit-meta a {
+  color: var(--mute);
+  font-size: 11px;
+  transition: color 180ms ease;
+}
+.current-work-commit-meta a:hover,
+.current-work-commit-meta a:focus-visible {
   color: var(--acc);
-  content: "+";
-  font-size: 16px;
-  line-height: 1;
 }
-.current-work-commit[open] summary::after {
-  content: "−";
-}
-.current-work-commit summary:focus-visible,
+.current-work-commit-meta a:focus-visible,
 .current-work-deployment:focus-visible {
   border-radius: 4px;
   outline: 2px solid var(--acc);
   outline-offset: 3px;
-}
-.current-work-commit code {
-  color: var(--fg);
-  font: 12px monospace;
-}
-.current-work-commit p {
-  max-width: 100%;
-  margin-top: 8px;
-  color: #c9c5bf;
-  overflow-wrap: anywhere;
 }
 @keyframes current-work-pulse {
   50% {
