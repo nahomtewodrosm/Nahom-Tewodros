@@ -112,24 +112,33 @@ export default function HeroShowcase({
             rel="noreferrer"
             aria-label={`View deployment: ${currentWork.deploymentUrl}`}
           >
-            <span className="current-work-deployment-label">Deployment</span>
+            <span className="current-work-deployment-label">
+              {currentWork.deploymentLabel}
+            </span>
             <span className="current-work-url">{currentWork.deploymentUrl}</span>
             <span aria-hidden="true">↗</span>
           </a>
-          <details className="current-work-commit">
-            <summary>
-              <span>Latest commit</span>
-              <code>
-                {currentWork.commitHash
-                  ? currentWork.commitHash.slice(0, 7)
-                  : "Not configured"}
-              </code>
-            </summary>
-            <p>
+          <div className="current-work-commit">
+            <p className="current-work-commit-label">Latest commit</p>
+            <p className="current-work-commit-message">
               {currentWork.commitMessage ||
                 "Commit details have not been configured yet."}
             </p>
-          </details>
+            {currentWork.commitHash && (
+              <div className="current-work-commit-meta">
+                <code>{currentWork.commitHash.slice(0, 7)}</code>
+                {currentWork.commitUrl && (
+                  <a
+                    href={currentWork.commitUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View commit <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </section>
         <div className="tech-marquee" aria-label="Technology skills">
           <div className="tech-track">

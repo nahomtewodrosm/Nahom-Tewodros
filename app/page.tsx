@@ -43,8 +43,14 @@ const experience = [
 ];
 
 export default async function Home() {
-  const [projects, posts, certifications, testimonials, siteSetting] =
-    await Promise.all([
+  const [
+    projects,
+    posts,
+    certifications,
+    testimonials,
+    siteSetting,
+    currentWork,
+  ] = await Promise.all([
       prisma.project.findMany({
         orderBy: { createdAt: "desc" },
         select: {
@@ -88,13 +94,14 @@ export default async function Home() {
         where: { key: "availability" },
         select: { available: true },
       }),
+      getCurrentWork(),
     ]);
   return (
     <div className="wrap">
       <MainNavigation />
       <HeroShowcase
         isAvailable={siteSetting?.available ?? true}
-        currentWork={getCurrentWork()}
+        currentWork={currentWork}
       />
 
       <section id="about">
