@@ -45,40 +45,46 @@ describe("getCurrentWork", () => {
     jest.restoreAllMocks();
   });
 
-  it("uses the most recently pushed repository and displays its latest commit", async () => {
+  it("uses the latest authored commit across repositories and branches", async () => {
     const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
     fetchMock
       .mockResolvedValueOnce(
-        jsonResponse([
-          {
-            name: "Portfolio",
-            full_name: "example-user/portfolio",
-            html_url: "https://github.com/example-user/portfolio",
-            homepage: "https://portfolio.example",
-            pushed_at: "2026-10-01T10:00:00Z",
-            default_branch: "main",
-            owner: { login: "example-user" },
-          },
-          {
-            name: "affiliate-hub",
-            full_name: "example-user/affiliate-hub",
-            html_url: "https://github.com/example-user/affiliate-hub",
-            homepage: "https://affiliate.example",
-            pushed_at: "2026-11-07T10:00:00Z",
-            default_branch: "main",
-            owner: { login: "example-user" },
-          },
-        ]),
+        jsonResponse({
+          items: [
+            {
+              sha: "1234567890abcdef",
+              html_url:
+                "https://github.com/example-user/affiliate-hub/commit/1234567890abcdef",
+              commit: {
+                message: "Show the latest repository change\n\nDetails",
+              },
+              repository: {
+                name: "affiliate-hub",
+                full_name: "example-user/affiliate-hub",
+                html_url: "https://github.com/example-user/affiliate-hub",
+              },
+            },
+            {
+              sha: "abcdef1234567890",
+              html_url:
+                "https://github.com/example-user/portfolio/commit/abcdef1234567890",
+              commit: { message: "An older portfolio update" },
+              repository: {
+                name: "portfolio",
+                full_name: "example-user/portfolio",
+                html_url: "https://github.com/example-user/portfolio",
+              },
+            },
+          ],
+        }),
       )
       .mockResolvedValueOnce(
-        jsonResponse([
-          {
-            sha: "1234567890abcdef",
-            html_url:
-              "https://github.com/example-user/affiliate-hub/commit/1234567890abcdef",
-            commit: { message: "Show the latest repository change\n\nDetails" },
-          },
-        ]),
+        jsonResponse({
+          name: "affiliate-hub",
+          full_name: "example-user/affiliate-hub",
+          html_url: "https://github.com/example-user/affiliate-hub",
+          homepage: "https://affiliate.example",
+        }),
       );
 
     await expect(getCurrentWork()).resolves.toEqual({
@@ -93,10 +99,10 @@ describe("getCurrentWork", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(String(fetchMock.mock.calls[0][0])).toContain(
-      "/user/repos?affiliation=owner&sort=pushed",
+      "/search/commits?q=author%3Aexample-user&sort=committer-date&order=desc",
     );
     expect(fetchMock.mock.calls[1][0]).toContain(
-      "/repos/example-user/affiliate-hub/commits?sha=main",
+      "/repos/example-user/affiliate-hub",
     );
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({
       Authorization: "Bearer test-token",

@@ -12,15 +12,19 @@ type GitHubRepository = {
   full_name: string;
   html_url: string;
   homepage: string | null;
-  pushed_at: string | null;
-  default_branch: string;
-  owner: { login: string };
 };
 
-type GitHubCommit = {
-  sha: string;
-  html_url: string;
-  commit: { message: string };
+type GitHubCommitSearchResult = {
+  items: Array<{
+    sha: string;
+    html_url: string;
+    commit: { message: string };
+    repository: {
+      name: string;
+      full_name: string;
+      html_url: string;
+    };
+  }>;
 };
 
 const githubApi = "https://api.github.com";
@@ -89,36 +93,22 @@ export async function getCurrentWork(): Promise<CurrentWork> {
   const username =
     process.env.CURRENT_WORK_GITHUB_USERNAME?.trim() || defaultUsername;
   const token = process.env.CURRENT_WORK_GITHUB_TOKEN?.trim();
-  const encodedUsername = encodeURIComponent(username);
 
   try {
-    const repositoriesPath = token
-      ? "/user/repos?affiliation=owner&sort=pushed&direction=desc&per_page=100"
-      : `/users/${encodedUsername}/repos?type=owner&sort=pushed&per_page=100`;
-    const repositories = await fetchGitHubJson<GitHubRepository[]>(
-      repositoriesPath,
+    const commits = await fetchGitHubJson<GitHubCommitSearchResult>(
+      `/search/commits?q=${encodeURIComponent(`author:${username}`)}&sort=committer-date&order=desc&per_page=1`,
       token,
     );
-    const latestRepository = repositories
-      .filter(
-        (repository) =>
-          repository.owner.login.toLowerCase() === username.toLowerCase() &&
-          repository.pushed_at,
-      )
-      .sort(
-        (first, second) =>
-          Date.parse(second.pushed_at!) - Date.parse(first.pushed_at!),
-      )[0];
+    const latestCommit = commits.items[0];
+    if (!latestCommit) return fallback;
 
-    if (!latestRepository) return fallback;
-
-    const commits = await fetchGitHubJson<GitHubCommit[]>(
-      `/repos/${latestRepository.full_name}/commits?sha=${encodeURIComponent(latestRepository.default_branch)}&per_page=1`,
+    const latestRepository = latestCommit.repository;
+    const repository = await fetchGitHubJson<GitHubRepository>(
+      `/repos/${latestRepository.full_name}`,
       token,
     );
-    const latestCommit = commits[0];
-    const deploymentUrl = isHttpUrl(latestRepository.homepage)
-      ? latestRepository.homepage
+    const deploymentUrl = isHttpUrl(repository.homepage)
+      ? repository.homepage
       : latestRepository.full_name.toLowerCase() ===
           `${username}/nahom-tewodros`.toLowerCase()
         ? defaultDeploymentUrl
@@ -127,14 +117,14 @@ export async function getCurrentWork(): Promise<CurrentWork> {
     return {
       projectName: titleFromRepositoryName(latestRepository.name),
       deploymentUrl,
-      deploymentLabel: isHttpUrl(latestRepository.homepage) ||
+      deploymentLabel: isHttpUrl(repository.homepage) ||
         deploymentUrl === defaultDeploymentUrl
         ? "Deployment"
         : "Repository",
-      commitHash: latestCommit?.sha || "",
+      commitHash: latestCommit.sha,
       commitMessage:
-        latestCommit?.commit.message.split(/\r?\n/, 1)[0]?.trim() || "",
-      commitUrl: latestCommit?.html_url || "",
+        latestCommit.commit.message.split(/\r?\n/, 1)[0]?.trim() || "",
+      commitUrl: latestCommit.html_url,
     };
   } catch (error) {
     console.error("Unable to load current work from GitHub.", error);
