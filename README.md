@@ -2,7 +2,7 @@
 
 # NAHOM TEWODROS
 
-### A portfolio built around thoughtful interfaces, useful details, and a little orange.
+### A portfolio built around thoughtful interfaces, useful details, and a little orange and black.
 
 An editorial, dark-mode portfolio for selected work, experience, skills, certifications, notes, testimonials, and contact — with a live map centered on Addis Ababa, Ethiopia.
 
