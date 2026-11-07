@@ -8,6 +8,7 @@ import NotesList from "../components/NotesList";
 import ProjectCard from "../components/ProjectCard";
 import SkillsShowcase from "../components/SkillsShowcase";
 import { MainNavigation } from "../components/Navigation";
+import { getCurrentWork } from "../lib/current-work";
 export const dynamic = "force-dynamic";
 
 const experience = [
@@ -91,7 +92,10 @@ export default async function Home() {
   return (
     <div className="wrap">
       <MainNavigation />
-      <HeroShowcase isAvailable={siteSetting?.available ?? true} />
+      <HeroShowcase
+        isAvailable={siteSetting?.available ?? true}
+        currentWork={getCurrentWork()}
+      />
 
       <section id="about">
         <p className="label">01 / About</p>

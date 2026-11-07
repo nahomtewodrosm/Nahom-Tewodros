@@ -14,6 +14,7 @@ import {
   SiTypescript,
   SiVercel,
 } from "react-icons/si";
+import type { CurrentWork } from "../lib/current-work";
 
 const technologies = [
   { name: "React", Icon: SiReact, className: "react" },
@@ -31,8 +32,10 @@ const technologies = [
 
 export default function HeroShowcase({
   isAvailable,
+  currentWork,
 }: {
   isAvailable: boolean;
+  currentWork: CurrentWork;
 }) {
   const heroRef = useRef<HTMLElement>(null);
 
@@ -91,6 +94,43 @@ export default function HeroShowcase({
             Download my CV
           </a>
         </div>
+        <section className="current-work" aria-labelledby="current-work-title">
+          <div className="current-work-heading">
+            <p className="current-work-label">
+              <span aria-hidden="true" />
+              Currently working on
+            </p>
+            <span className="current-work-status">In progress</span>
+          </div>
+          <h2 className="current-work-title" id="current-work-title">
+            {currentWork.projectName}
+          </h2>
+          <a
+            className="current-work-deployment"
+            href={currentWork.deploymentUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`View deployment: ${currentWork.deploymentUrl}`}
+          >
+            <span className="current-work-deployment-label">Deployment</span>
+            <span className="current-work-url">{currentWork.deploymentUrl}</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+          <details className="current-work-commit">
+            <summary>
+              <span>Latest commit</span>
+              <code>
+                {currentWork.commitHash
+                  ? currentWork.commitHash.slice(0, 7)
+                  : "Not configured"}
+              </code>
+            </summary>
+            <p>
+              {currentWork.commitMessage ||
+                "Commit details have not been configured yet."}
+            </p>
+          </details>
+        </section>
         <div className="tech-marquee" aria-label="Technology skills">
           <div className="tech-track">
             {[0, 1].map((copy) => (

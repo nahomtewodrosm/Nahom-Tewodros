@@ -87,6 +87,8 @@ SESSION_SECRET="replace-with-a-long-random-secret"
 
 `DATABASE_URL`, `ADMIN_PASSWORD`, and `SESSION_SECRET` are required for database access and protected admin sessions. Keep secrets in `.env` or your hosting provider’s environment settings; never commit them.
 
+The hero’s **Currently working on** card uses the portfolio deployment by default. Optionally set `CURRENT_WORK_PROJECT`, `CURRENT_WORK_URL`, `CURRENT_WORK_COMMIT_HASH`, and `CURRENT_WORK_COMMIT_MESSAGE` in the deployment environment to show a different project and its real commit details. Leave the commit variables unset if no verified commit information is available.
+
 Email notifications are optional. To enable them, also set:
 
 ```dotenv
